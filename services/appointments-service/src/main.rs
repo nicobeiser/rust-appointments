@@ -1,5 +1,6 @@
 mod routes;
 mod handlers;
+mod models;
 
 use dotenvy::dotenv;
 use std::{env, net::SocketAddr};
@@ -21,6 +22,7 @@ async fn main() {
 
     let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string());
     let port: u16 = port.parse().expect("PORT debe ser un número válido");
+
 
     let app = create_router();
 
