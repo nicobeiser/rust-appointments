@@ -1,31 +1,46 @@
-use axum::Json;
+use axum::{extract::State, Json};
+use sqlx::Postgres;
 use crate::models::service::Service;
+use crate::state::AppState;
 
 
-pub async fn get_services() -> Json<Vec<Service>>{
+pub async fn get_services(
+    State(state): State<AppState>
+) -> Result<Json<Vec<Service>>,(axum::http::StatusCode, String)>{
 
-    let services = vec![
-        Service{
-            id:1,
-            name: "Corte clasico".to_string(),
-            duration_minutes:30,
-            price:5.0
-        },
-         Service{
-            id:2,
-            name: "Corte premium".to_string(),
-            duration_minutes:40,
-            price:8.0
-        },
-         Service{
-            id:3,
-            name: "Corte rapido".to_string(),
-            duration_minutes:20,
-            price:6.0
-        },
-        
+let pool: &sqlx::PgPool = &state.db;
 
-    ];
+let services:Vec<Service> = sqlx::query_as(
+    "SELECT id, name, duration_minutes, price FROM services ORDER BY id"
+)
+.fetch_all(pool)
+.await
+.map_err(internal_error)?;
 
-    Json(services)
+    Ok(Json(services))
+}
+
+fn internal_error(error: sqlx::Error) -> (axum::http::StatusCode, String) {
+    (
+        axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+        format!("Database error: {}", error),
+    )
+}   
+
+
+async fn get_service_names(
+    State(state) :  State<AppState>
+) -> Result<Json<Vec<String>>,(axum::http::StatusCode, String)>{
+
+    let pool = &state.db;
+    let names:Result<Vec<String>, (axum::http::StatusCode, String)> = sqlx::query_scalar(
+        "SELECT name FROM services"
+    )
+    .fetch_all(pool)
+    .await
+    .map_err(internal_error);
+    let result = names?;
+
+    Ok(Json(result))
+
 }

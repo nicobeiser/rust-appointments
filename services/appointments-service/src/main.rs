@@ -1,7 +1,11 @@
 mod routes;
 mod handlers;
 mod models;
+mod dto;
+mod db;
+mod state;
 
+use db::create_pool;
 use dotenvy::dotenv;
 use std::{env, net::SocketAddr};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -24,11 +28,15 @@ async fn main() {
     let port: u16 = port.parse().expect("PORT debe ser un número válido");
 
 
-    let app = create_router();
+   
 
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
 
     tracing::info!("Servidor corriendo en http://{}", addr);
+
+    let pool=create_pool().await.expect("hubo un error conectando la bd");
+
+    let app = create_router(pool);
 
     let listener = tokio::net::TcpListener::bind(addr)
         .await
