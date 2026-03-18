@@ -4,6 +4,7 @@ mod models;
 mod dto;
 mod db;
 mod state;
+mod auth;
 
 use db::create_pool;
 use dotenvy::dotenv;
