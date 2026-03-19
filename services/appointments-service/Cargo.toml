@@ -14,8 +14,9 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 anyhow = "1"
 bigdecimal = { version = "0.4", features = ["serde"] }
-sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "chrono", "macros", "bigdecimal"] }
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "chrono", "macros", "bigdecimal", "uuid"] }
 chrono = { version = "0.4", features = ["serde"] }
 jsonwebtoken = "10"
 bcrypt = "0.19"
 uuid = { version = "1", features = ["v4", "serde"] }
+async-trait = "0.1"
